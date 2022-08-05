@@ -1,40 +1,36 @@
-﻿const Discord = require('discord.js')
 const fs = require('fs')
-const client = new Discord.Client(); 
-const config = require("./config.json"); 
+const { Client } = require('discord.js')
+const client = new Client();
+const { token, prefix } = require("./config.json");
 
-client.on('ready', async  => {
-
-  console.log(`Bot iniciado -AlphaRD.`);
+client.on('ready', async => {
+    console.log('ready');
 })
-  
-  fs.readdir("./events/", (err, files) => {
+
+fs.readdir("./events/", (err, files) => {
     if (err) return console.error(err);
     files.forEach(file => {
-      let eventFunction = require(`./events/${file}`);
-      let eventName = file.split(".")[0];
-        
-  
-  client.on(eventName, (...args) => eventFunction.run(client, ...args));
+        let eventFunction = require(`./events/${file}`);
+        let eventName = file.split(".")[0];
+
+        client.on(eventName, (...args) => eventFunction.run(client, ...args));
     });
-  client.on("message", message => {
+})
+
+client.on("message", message => {
     if (message.author.bot) return;
-    if (!message.content.startsWith(config.prefix)) return;
-  
-    let comando = message.content.split(" ")[0];
-    comando = command.slice(config.prefix.length);
-  
+    if (!message.content.startsWith(prefix)) return;
+
+    let comando = message.content.split(" ")[0].slice(prefix.length);
     let args = message.content.split(" ").slice(1);
-  
+
     try {
-      let commandFile = require(`./comandos/${comando}.js`);
-      commandFile.run(client, message, args);
+        let commandFile = require(`./comandos/${comando}.js`);
+        commandFile.run(client, message, args);
     } catch (err) {
-      console.error(err);
+        console.error(err);
     }
-  })
+})
 
 
-  })
-
-client.login(config.token)
+client.login(token)
